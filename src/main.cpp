@@ -33,7 +33,7 @@ std::string to_json(const GoveeData &data) {
   std::stringstream s;
   s << "{\"timestamp\":" << data.timestamp << ",\"temp\":" << data.temp
     << ",\"humidity\":" << data.humidity << ",\"battery\":" << data.battery
-    << ",\"name\":" << data.name
+    << ",\"name\":\"" << data.name << "\""
     << "}";
   return s.str();
 }
@@ -51,7 +51,7 @@ void put_temperatures(
     std::string json = to_json(pair.second);
     auto result = kinesis_client->PutRecord(
         Aws::Kinesis::Model::PutRecordRequest()
-            .WithStreamName(Aws::String("govee-data-stream"))
+            .WithStreamName(Aws::String("govee-data"))
             .WithData(Aws::Utils::ByteBuffer(
                 reinterpret_cast<unsigned char *>(json.data()), json.length()))
             .WithPartitionKey("testing"));
