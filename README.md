@@ -15,7 +15,7 @@ The format of the uploaded data is:
 
 Heavily borrowed from [GoveeBTTempLogger](https://github.com/wcbonner/GoveeBTTempLogger)
 
-## Building
+## Building And Running
 [Install AWS](https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/setup.html) (For raspberry pi you need to build from source)
 
 Install bluez:
@@ -24,6 +24,11 @@ sudo apt-get install libbluetooth-dev
 ```
 
 Run `make` from the govee directory and the executable should end up at `build/apps/govee`
+
+Run:
+```bash
+./build/apps/govee --streamname=govee-data
+```
 
 ## Installing as a system service
 (These instructions are also in `install.sh`)
