@@ -4,7 +4,7 @@ Description=Govee service
 [Service]
 Type=simple
 User=root
-ExecStart=/bin/govee
+ExecStart=/bin/govee --streamname=govee-data
 Restart=always
 RestartSec=5
 StartLimitBurst=5

@@ -9,6 +9,7 @@
 #include <thread>
 #include <map>
 #include <unordered_map>
+#include <getopt.h>
 
 #include <aws/core/Aws.h>
 #include <aws/kinesis/KinesisClient.h>
@@ -19,6 +20,36 @@
 #include "Util.h"
 #include "GoveeEventHandler.h"
 #include "GoveeData.h"
+
+struct Args {
+  std::optional<std::string> stream_name;
+};
+
+void print_help() {
+  Log("Usage: govee --streamname govee-data");
+}
+
+Args parse_args(int argc, char *argv[]) {
+  const struct option longopts[] = {
+    {"help",      no_argument,        0, 'h'},
+    {"streamname",     required_argument,  0, 's'},
+    {0,0,0,0},
+  };
+  Args args;
+  int index;
+  int iarg=0;
+  while(iarg != -1) {
+    switch (iarg = getopt_long(argc, argv, "hs:", longopts, &index)) {
+      case 'h':
+        print_help();
+        break;
+      case 's':
+        args.stream_name = std::string(optarg);
+        break;
+    }
+  }
+  return args;
+}
 
 // How often data is retrieved from the sensors
 const std::chrono::seconds::rep UPDATE_PERIOD = 60;
@@ -37,12 +68,12 @@ std::atomic<bool> running = true;
 
 // Uploads data in json format to AWS Kinesis
 void put_temperatures(
-    std::shared_ptr<Aws::Kinesis::KinesisClient> kinesis_client) {
+    std::shared_ptr<Aws::Kinesis::KinesisClient> kinesis_client, std::string stream_name) {
   for (const auto &[addr, data] : govee_data) {
     std::string json = to_json(data);
     auto result = kinesis_client->PutRecord(
         Aws::Kinesis::Model::PutRecordRequest()
-            .WithStreamName(Aws::String("govee-data"))
+            .WithStreamName(Aws::String(stream_name))
             .WithData(Aws::Utils::ByteBuffer(
                 reinterpret_cast<unsigned char *>(json.data()), json.length()))
             .WithPartitionKey("testing"));
@@ -101,15 +132,22 @@ void signal_handler(int signal) {
   running = false;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   std::signal(SIGINT, signal_handler);
+
+  Args args = parse_args(argc, argv);
+
+  if (!args.stream_name) {
+    print_help();
+    return 0;
+  }
 
   // Setup AWS
   Aws::SDKOptions options;
   options.loggingOptions.logLevel = Aws::Utils::Logging::LogLevel::Info;
   Aws::InitAPI(options);
   Defer shutdownAws([=] { Aws::ShutdownAPI(options); });
-  auto kinesis_client = Aws::MakeShared<Aws::Kinesis::KinesisClient>("test");
+  auto kinesis_client = Aws::MakeShared<Aws::Kinesis::KinesisClient>("KinesisClient");
   std::vector<std::thread> awsThreads;
 
   // Govee event parser
@@ -126,7 +164,7 @@ int main() {
     scanner.scan(govee_event_parser, SCAN_DURATION);
 
     // Upload temperatures
-    awsThreads.emplace_back(put_temperatures, kinesis_client);
+    awsThreads.emplace_back(put_temperatures, kinesis_client, *args.stream_name);
 
     // Wait until next update
     for (int i = 0; i < UPDATE_PERIOD - SCAN_DURATION; i++) {
