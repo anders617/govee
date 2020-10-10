@@ -1,0 +1,15 @@
+[Unit]
+Description=Govee service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/bin/govee
+Restart=always
+RestartSec=5
+StartLimitBurst=5
+StartLimitInterval=1m
+StartLimitAction=reboot
+
+[Install]
+WantedBy=multi-user.target
