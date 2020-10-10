@@ -5,6 +5,11 @@
 #include <functional>
 #include <cstring>
 
+constexpr uint8_t EIR_FLAGS = 0X01;
+constexpr uint8_t EIR_NAME_SHORT = 0x08;
+constexpr uint8_t EIR_NAME_COMPLETE = 0x09;
+constexpr uint8_t EIR_MANUFACTURE_SPECIFIC = 0xFF;
+
 void Log(const char *format, ...);
 
 struct Defer {

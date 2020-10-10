@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "Util.h"
-
 const int ON = 1;
 const int OFF = 0;
 
