@@ -1,6 +1,6 @@
 # govee
 
-This application uses bluetooth to scan for [Govee H5075](https://www.amazon.com/Govee-Temperature-Humidity-Notification-Monitor/dp/B07Y36FWTT) devices and pushes the data to an AWS Kinesis stream. Works well on a raspberry pi.
+Scans for [Govee H5075](https://www.amazon.com/Govee-Temperature-Humidity-Notification-Monitor/dp/B07Y36FWTT) devices over bluetooth and pushes the data to an AWS Kinesis stream. Works well on a raspberry pi.
 
 The format of the uploaded data is:
 ```javascript
@@ -13,7 +13,7 @@ The format of the uploaded data is:
 }
 ```
 
-# Building
+## Building
 [Install AWS](https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/setup.html) (For raspberry pi you need to build from source)
 
 Install bluez:
@@ -23,7 +23,7 @@ sudo apt-get install libbluetooth-dev
 
 Run `make` from the govee directory and the executable should end up at `build/apps/govee`
 
-# Installing as a system service
+## Installing as a system service
 (These instructions are also in `install.sh`)
 
 Change the ExecStart line in `govee.service` to match your AWS kinesis stream name:
