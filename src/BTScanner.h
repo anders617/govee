@@ -17,6 +17,19 @@
 
 #include "Util.h"
 
+// Class for scanning for evt_le_meta_event bluetooth events.
+//
+// Can be used with a function handler:
+// BTScanner scanner;
+// scanner.scan([](evt_le_meta_event *meta) {
+//    std::cout << "Received meta event" << std::endl;
+// }, 10);
+//
+// Or with an object handler containing a parse method:
+// class EventParser { void parse(evt_le_meta_event *meta) {...}};
+// EventParser parser;
+// BTScanner scanner;
+// scanner.scan(parser, 10);
 class BTScanner {
 public:
   // Scan from device with addr "XX:XX:XX:XX:XX:XX"
@@ -27,10 +40,19 @@ public:
 
   ~BTScanner();
 
+  // Scans for scan_duration seconds.
+  // handle_message is a function which is called every time a evt_le_meta_event
+  // is received. The function can return true to stop scanning.
   bool scan(std::function<bool(evt_le_meta_event *)> handle_message,
             std::chrono::seconds::rep scan_duration);
-  template<typename T>
+
+  // Scans for scan_duration seconds.
+  // event_handler is an object with a void parse(evt_le_meta_event *) method
+  // that is called each time a evt_le_meta_event is received.
+  template <typename T>
   bool scan(T &event_handler, std::chrono::seconds::rep scan_duration);
+
+  // Stop scanning bluetooth short of scan_duration.
   void stop_scanning();
 
 private:
@@ -43,8 +65,9 @@ private:
   struct hci_filter original_filter;
 };
 
-template<typename T>
-bool BTScanner::scan(T &event_handler, std::chrono::seconds::rep scan_duration) {
+template <typename T>
+bool BTScanner::scan(T &event_handler,
+                     std::chrono::seconds::rep scan_duration) {
   bool error = false;
   scanning = true;
   auto scanStartTime = std::chrono::steady_clock::now();

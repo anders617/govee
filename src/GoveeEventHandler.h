@@ -9,7 +9,7 @@
 #include <bluetooth/hci.h>
 
 /**
- * Class for parsing bluetooth evt_le_meta_event messages.
+ * Class for parsing bluetooth evt_le_meta_event messages that contain Govee data.
  * 
  * Name handlers are called when a message advertising the name for a device is parsed.
  * 

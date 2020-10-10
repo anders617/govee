@@ -94,7 +94,7 @@ bool is_govee_name(std::string_view name) {
 }
 
 
-// Event Handlers
+// Event Handlers (called each time a govee name/data message arrives)
 
 void store_name(std::string_view addr, std::string_view name) {
   std::string key(addr);
