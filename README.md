@@ -13,6 +13,8 @@ The format of the uploaded data is:
 }
 ```
 
+Heavily borrowed from [GoveeBTTempLogger](https://github.com/wcbonner/GoveeBTTempLogger)
+
 ## Building
 [Install AWS](https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/setup.html) (For raspberry pi you need to build from source)
 
