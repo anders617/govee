@@ -6,7 +6,7 @@ Requires=bluetooth.target
 [Service]
 Type=simple
 User=root
-ExecStart=/bin/govee --streamname=govee-data
+ExecStart=/bin/govee --stream_name=govee-data
 Restart=always
 RestartSec=5
 StartLimitBurst=5

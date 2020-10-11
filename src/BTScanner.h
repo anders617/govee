@@ -17,6 +17,8 @@
 
 #include "Util.h"
 
+namespace govee {
+
 // Class for scanning for evt_le_meta_event bluetooth events.
 //
 // Can be used with a function handler:
@@ -72,8 +74,8 @@ bool BTScanner::scan(T &event_handler,
   scanning = true;
   auto scanStartTime = std::chrono::steady_clock::now();
   // Enable scanning
-  CHECK(hci_le_set_scan_enable(device_handle, 0x01, 1, 1000),
-        "Failed to enable scan");
+  util::CHECK(hci_le_set_scan_enable(device_handle, 0x01, 1, 1000),
+              "Failed to enable scan");
   while (scanning && !error) {
     if (std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - scanStartTime)
@@ -89,9 +91,11 @@ bool BTScanner::scan(T &event_handler,
     }
   }
   // Disable scanning
-  CHECK(hci_le_set_scan_enable(device_handle, 0x00, 1, 1000),
-        "Failed to disable scan");
+  util::CHECK(hci_le_set_scan_enable(device_handle, 0x00, 1, 1000),
+              "Failed to disable scan");
   return false;
 }
+
+} // namespace govee
 
 #endif

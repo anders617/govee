@@ -27,7 +27,7 @@ Run `make` from the govee directory and the executable should end up at `build/a
 
 Run:
 ```bash
-./build/apps/govee --streamname=govee-data
+./build/apps/govee --stream_name=govee-data
 ```
 
 ## Installing as a system service
@@ -35,7 +35,7 @@ Run:
 
 Change the ExecStart line in `govee.service` to match your AWS kinesis stream name:
 ```
-ExecStart=/bin/govee --streamname=YOUR_STREAM_NAME
+ExecStart=/bin/govee --stream_name=YOUR_STREAM_NAME
 ```
 
 Copy `govee.service` to `/etc/systemd/system/govee.service`:

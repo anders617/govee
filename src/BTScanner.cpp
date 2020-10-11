@@ -2,8 +2,12 @@
 
 #include <iostream>
 
+namespace govee {
+
 const int ON = 1;
 const int OFF = 0;
+
+using util::CHECK;
 
 BTScanner::BTScanner(const std::string &bd_addr) {
   bdaddr_t ba;
@@ -102,3 +106,5 @@ bool BTScanner::scan(std::function<bool(evt_le_meta_event *)> handle_message,
         "Failed to disable scan");
   return false;
 }
+
+} // namespace govee

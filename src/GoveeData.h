@@ -3,6 +3,8 @@
 
 #include <string>
 
+namespace govee {
+
 struct GoveeData {
   long long int timestamp;
   std::string name;
@@ -18,5 +20,7 @@ std::string to_json(const GoveeData &data) {
     << "}";
   return s.str();
 }
+
+} // namespace govee
 
 #endif

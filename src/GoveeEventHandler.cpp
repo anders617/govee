@@ -2,6 +2,10 @@
 
 #include "Util.h"
 
+namespace govee {
+
+using util::Log;
+
 int GoveeEventParser::add_name_handler(NameEventHandler name_handler) {
   int id = next_handler_id++;
   name_handlers[id] = name_handler;
@@ -14,16 +18,14 @@ int GoveeEventParser::add_data_handler(DataEventHandler data_handler) {
   return next_handler_id;
 }
 
-void GoveeEventParser::remove_name_handler(int id) {
-  name_handlers.erase(id);
-}
+void GoveeEventParser::remove_name_handler(int id) { name_handlers.erase(id); }
 
-void GoveeEventParser::remove_data_handler(int id) {
-  data_handlers.erase(id);
-}
+void GoveeEventParser::remove_data_handler(int id) { data_handlers.erase(id); }
 
-std::optional<std::tuple<float, float, int>> GoveeEventParser::read_data(const uint8_t *data, const size_t data_len) {
-  if (data_len != 9 && data_len != 10) return std::nullopt;
+std::optional<std::tuple<float, float, int>>
+GoveeEventParser::read_data(const uint8_t *data, const size_t data_len) {
+  if (data_len != 9 && data_len != 10)
+    return std::nullopt;
   if ((data[1] == 0x88) && (data[2] == 0xEC)) {
     float temp = -1, humidity = -1;
     int battery = -1;
@@ -77,11 +79,13 @@ void GoveeEventParser::parse(evt_le_meta_event *meta) {
       std::string_view strAddr(addr);
       if ((info->data + current_offset + 1)[0] == EIR_NAME_SHORT ||
           (info->data + current_offset + 1)[0] == EIR_NAME_COMPLETE) {
-        std::string name((char *)&((info->data + current_offset + 1)[1]), data_len-1);
+        std::string name((char *)&((info->data + current_offset + 1)[1]),
+                         data_len - 1);
         for (const auto &[id, name_handler] : name_handlers) {
           name_handler(strAddr, name);
         }
-      } else if ((info->data + current_offset + 1)[0] == EIR_MANUFACTURE_SPECIFIC) {
+      } else if ((info->data + current_offset + 1)[0] ==
+                 EIR_MANUFACTURE_SPECIFIC) {
         if (auto new_data =
                 read_data((info->data + current_offset + 1), data_len)) {
           const auto [temp, humidity, battery] = *new_data;
@@ -94,3 +98,5 @@ void GoveeEventParser::parse(evt_le_meta_event *meta) {
     }
   }
 }
+
+} // namespace govee
