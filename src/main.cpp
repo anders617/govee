@@ -126,6 +126,7 @@ int main(int argc, char *argv[]) {
   if (scan_duration >= update_period) {
     Log("Scan duration must be less than update period.");
     govee::util::print_help();
+    return 0;
   }
 
   // Setup AWS
