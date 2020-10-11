@@ -70,6 +70,14 @@ bool is_govee_name(std::string_view name) {
          name.compare(0, 11, "Govee_H5074") == 0;
 }
 
+// Check measurements are within valid operating range.
+bool is_valid_data(float temp, float humidity, int battery) {
+  if (temp < 32 || temp > 122) return false;
+  if (humidity < 0 || humidity > 99) return false;
+  if (battery < 0 || battery > 100) return false;
+  return true;
+}
+
 // Event Handlers (called each time a govee name/data message arrives)
 
 void store_name(std::string_view addr, std::string_view name) {
@@ -85,6 +93,7 @@ void log_name(std::string_view addr, std::string_view name) {
 
 void store_data(std::string_view addr, float temp, float humidity,
                 int battery) {
+  if (!is_valid_data(temp, humidity, battery)) return;
   std::string key(addr);
   if (address_to_name.count(key)) {
     govee_data[key] = {
@@ -94,8 +103,9 @@ void store_data(std::string_view addr, float temp, float humidity,
 }
 
 void log_data(std::string_view addr, float temp, float humidity, int battery) {
-  Log("[%s] Data={temp: %f, humidity: %f, battery: %d}", addr.data(), temp,
-      humidity, battery);
+  bool valid = is_valid_data(temp, humidity, battery);
+  Log("[%s] Data={temp: %f, humidity: %f, battery: %d} valid?: %d", addr.data(), temp,
+      humidity, battery, valid);
 }
 
 // This ensures we shutdown properly by disabling bluetooth scan etc. before
@@ -148,6 +158,8 @@ int main(int argc, char *argv[]) {
   govee_event_parser.add_data_handler(log_data);
 
   while (running) {
+    govee_data.clear();
+
     // Scan for temperatures
     scanner.scan(govee_event_parser, scan_duration);
 
